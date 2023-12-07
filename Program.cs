@@ -14,6 +14,7 @@ namespace L40_databasePlayers
             DatabasePlayers database = new DatabasePlayers();
             Player player1 = new Player(1, "Jon");      // Не стал выделять уровни и имена в отдельные переменные,
             Player palyer2 = new Player(3, "Sam");      // так как здесь проверяется функционал классов, и весь код в методе Main является тестовым
+            Player player3 = new Player(4, "Igor");
 
             database.AddPlayer(player1);
             database.AddPlayer(palyer2);
@@ -26,6 +27,9 @@ namespace L40_databasePlayers
 
             Console.WriteLine();
             database.ShowAllPlayers();
+
+            database.RemovePlayer(player3);
+            database.RemovePlayer(player1);
         }
 
         class Player
