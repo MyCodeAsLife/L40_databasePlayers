@@ -12,8 +12,8 @@ namespace L40_databasePlayers
         static void Main(string[] args)
         {
             DatabasePlayers database = new DatabasePlayers();
-            Player player1 = new Player(1, "Jon");      // Не стал выделять уровни и имена в отдельные переменные,
-            Player palyer2 = new Player(3, "Sam");      // так как здесь проверяется функционал классов, и весь код в методе Main является тестовым
+            Player player1 = new Player(1, "Jon");
+            Player palyer2 = new Player(3, "Sam");
             Player player3 = new Player(4, "Igor");
 
             database.AddPlayer(player1);
@@ -34,45 +34,24 @@ namespace L40_databasePlayers
 
         class Player
         {
-            private int _id = -1;
             private int _level;
             private string _name;
-            private bool _isBaned = false;
 
             public Player(int level, string name, bool isBaned = false)
             {
                 _level = level;
                 _name = name;
-                _isBaned = isBaned;
+                this.IsBaned = isBaned;
+                this.Id = -1;
             }
 
-            public int Id
-            {
-                get
-                {
-                    return _id;
-                }
-                set
-                {
-                    _id = value;
-                }
-            }
+            public int Id { get; set; }
 
-            public bool IsBaned
-            {
-                get
-                {
-                    return _isBaned;
-                }
-                set
-                {
-                    _isBaned = value;
-                }
-            }
+            public bool IsBaned { get; set; }
 
             public void ShowInfo()
             {
-                Console.WriteLine($"Имя игрока: {_name}, id: {_id}, уровень: {_level}\nЗабанен ли игрок: {_isBaned}\n");
+                Console.WriteLine($"Имя игрока: {_name}, id: {Id}, уровень: {_level}\nЗабанен ли игрок: {IsBaned}\n");
             }
         }
 
@@ -105,44 +84,54 @@ namespace L40_databasePlayers
 
             public void BanPlayer(int id)
             {
-                foreach (var player in players)
-                    if (player.Id == id)
-                        if (player.IsBaned)
-                        {
-                            Console.WriteLine("Данный игрок уже забанен.");
-                            break;
-                        }
-                        else
-                        {
-                            player.IsBaned = true;
-                            Console.WriteLine("Бан игроку успешно выдан.");
-                            break;
-                        }
+                Player player = GetPlayer(id);
+
+                if (player != null)
+                {
+                    if (player.IsBaned)
+                    {
+                        Console.WriteLine("Данный игрок уже забанен.");
+                    }
+                    else
+                    {
+                        player.IsBaned = true;
+                        Console.WriteLine("Бан игроку успешно выдан.");
+                    }
+                }
             }
 
             public void UnbanPlayer(int id)
             {
+                Player player = GetPlayer(id);
+
+                if (player != null)
+                {
+                    if (player.IsBaned)
+                    {
+                        player.IsBaned = false;
+                        Console.WriteLine("Игрок успешно разбанен.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Данный игрок не был забанен.");
+                    }
+                }
+            }
+
+            private Player GetPlayer(int id)
+            {
                 foreach (var player in players)
                     if (player.Id == id)
-                        if (player.IsBaned)
-                        {
-                            player.IsBaned = false;
-                            Console.WriteLine("Игрок успешно разбанен.");
-                            break;
-                        }
-                        else
-                        {
-                            Console.WriteLine("Данный игрок не был забанен.");
-                            break;
-                        }
+                        return player;
+
+                Console.WriteLine("Не найдено игрока с таким id.");
+                return null;
             }
 
             public void ShowAllPlayers()
             {
                 foreach (var player in players)
                     player.ShowInfo();
-
-                Console.WriteLine();
             }
         }
     }
