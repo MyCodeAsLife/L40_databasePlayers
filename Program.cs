@@ -76,14 +76,17 @@ namespace L40_databasePlayers
         static int GetNumber()
         {
             int number = 0;
+            bool isNotCorrect = true;
 
-            while (true)
+            while (isNotCorrect)
             {
                 if (int.TryParse(Console.ReadLine(), out number))
-                    return number;
+                    isNotCorrect = false;
                 else
                     ShowError();
             }
+
+            return number;
         }
 
         static void CreatePalyer(Database database)
@@ -139,9 +142,14 @@ namespace L40_databasePlayers
 
         public bool IsBaned { get; private set; }
 
-        public void ChangeBan(bool isBaned)
+        public void Baned()
         {
-            IsBaned = isBaned;
+            IsBaned = true;
+        }
+
+        public void Unbaned()
+        {
+            IsBaned = false;
         }
 
         public void ShowInfo()
@@ -153,7 +161,7 @@ namespace L40_databasePlayers
     class Database
     {
         private List<Player> _players = new List<Player>();
-        private static int _uniqueId = 0;
+        private static int s_uniqueId = 0;
 
         public Database() { }
 
@@ -161,21 +169,19 @@ namespace L40_databasePlayers
         {
             Player player;
 
-            if (GetPlayer(id, out player))
+            if (TryGetPlayer(id, out player))
                 _players.Remove(player);
         }
 
         public void CreatePlayer(int level, string name)
         {
-            _players.Add(new Player(++_uniqueId, level, name));
+            _players.Add(new Player(++s_uniqueId, level, name));
             Console.WriteLine("Игрок создан.");
         }
 
         public void BanPlayer(int id)
         {
-            Player player;
-
-            if (GetPlayer(id, out player))
+            if (TryGetPlayer(id, out Player player))
             {
                 if (player.IsBaned)
                 {
@@ -183,7 +189,7 @@ namespace L40_databasePlayers
                 }
                 else
                 {
-                    player.ChangeBan(true);
+                    player.Baned();
                     Console.WriteLine("Бан игроку успешно выдан.");
                 }
             }
@@ -191,13 +197,11 @@ namespace L40_databasePlayers
 
         public void UnbanPlayer(int id)
         {
-            Player player;
-
-            if (GetPlayer(id, out player))
+            if (TryGetPlayer(id, out Player player))
             {
                 if (player.IsBaned)
                 {
-                    player.ChangeBan(false);
+                    player.Unbaned();
                     Console.WriteLine("Игрок успешно разбанен.");
                 }
                 else
@@ -207,7 +211,13 @@ namespace L40_databasePlayers
             }
         }
 
-        private bool GetPlayer(int id, out Player player)
+        public void ShowAllPlayers()
+        {
+            foreach (Player player in _players)
+                player.ShowInfo();
+        }
+
+        private bool TryGetPlayer(int id, out Player player)
         {
             foreach (Player playerToFind in _players)
                 if (playerToFind.Id == id)
@@ -219,12 +229,6 @@ namespace L40_databasePlayers
             player = null;
             Console.WriteLine("Не найдено игрока с таким id.");
             return false;
-        }
-
-        public void ShowAllPlayers()
-        {
-            foreach (Player player in _players)
-                player.ShowInfo();
         }
     }
 }
