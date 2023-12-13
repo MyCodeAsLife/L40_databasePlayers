@@ -29,99 +29,58 @@ namespace L40_databasePlayers
                                   $"игрока по индексу.\n{CommandShowAllPlayers} - Показать всех игроков.\n{CommandExit} - Выход из прогрммы.");
 
                 Console.Write("Выбирете действие: ");
-                int menuNumber = GetNumber();
-                Console.Clear();
 
-                switch (menuNumber)
+                if (int.TryParse(Console.ReadLine(), out int menuNumber))
                 {
-                    case CommandCreatePlayer:
-                        CreatePalyer(database);
-                        break;
+                    Console.Clear();
 
-                    case CommandRemovePlayer:
-                        RemovePalyer(database);
-                        break;
+                    switch (menuNumber)
+                    {
+                        case CommandCreatePlayer:
+                            database.CreatePlayer();
+                            break;
 
-                    case CommandBanedPalayer:
-                        BanedPlayer(database);
-                        break;
+                        case CommandRemovePlayer:
+                            database.RemovePlayer();
+                            break;
 
-                    case CommandUnbanedPlayer:
-                        UnbanedPlayer(database);
-                        break;
+                        case CommandBanedPalayer:
+                            database.BanPlayer();
+                            break;
 
-                    case CommandShowAllPlayers:
-                        database.ShowAllPlayers();
-                        break;
+                        case CommandUnbanedPlayer:
+                            database.UnbanPlayer();
+                            break;
 
-                    case CommandExit:
-                        isOpen = false;
-                        continue;
+                        case CommandShowAllPlayers:
+                            database.ShowAllPlayers();
+                            break;
 
-                    default:
-                        ShowError();
-                        break;
+                        case CommandExit:
+                            isOpen = false;
+                            continue;
+
+                        default:
+                            Erorr.Show();
+                            break;
+                    }
+                }
+                else
+                {
+                    Erorr.Show();
                 }
 
                 Console.WriteLine("\nДля возврата в меню нажмите любую клавишу...");
                 Console.ReadKey(true);
             }
         }
+    }
 
-        static void ShowError()
+    class Erorr
+    {
+        public static void Show()
         {
             Console.WriteLine("Вы ввели некорректное значение.");
-        }
-
-        static int GetNumber()
-        {
-            int number = 0;
-            bool isNotCorrect = true;
-
-            while (isNotCorrect)
-            {
-                if (int.TryParse(Console.ReadLine(), out number))
-                    isNotCorrect = false;
-                else
-                    ShowError();
-            }
-
-            return number;
-        }
-
-        static void CreatePalyer(Database database)
-        {
-            Console.Write("Введите Имя нового игрока: ");
-            string playerName = Console.ReadLine();
-
-            Console.Write("Введите  уровень нового игрока: ");
-            int playerLevel = GetNumber();
-
-            database.CreatePlayer(playerLevel, playerName);
-        }
-
-        static void RemovePalyer(Database database)
-        {
-            Console.Write("Введите id игрока: ");
-            int id = GetNumber();
-
-            database.RemovePlayer(id);
-        }
-
-        static void BanedPlayer(Database database)
-        {
-            Console.Write("Введите id игрока: ");
-            int id = GetNumber();
-
-            database.BanPlayer(id);
-        }
-
-        static void UnbanedPlayer(Database database)
-        {
-            Console.Write("Введите id игрока: ");
-            int id = GetNumber();
-
-            database.UnbanPlayer(id);
         }
     }
 
@@ -163,14 +122,24 @@ namespace L40_databasePlayers
         private List<Player> _players = new List<Player>();
         private static int s_uniqueId = 0;
 
-        public Database() { }
-
-        public void RemovePlayer(int id)
+        public void RemovePlayer()
         {
-            Player player;
+            Console.Write("Введите id игрока: ");
+            int id = GetNumber();
 
-            if (TryGetPlayer(id, out player))
+            if (TryGetPlayer(id, out Player player))
                 _players.Remove(player);
+        }
+
+        public void CreatePlayer()
+        {
+            Console.Write("Введите Имя нового игрока: ");
+            string name = Console.ReadLine();
+
+            Console.Write("Введите  уровень нового игрока: ");
+            int level = GetNumber();
+
+            CreatePlayer(level, name);
         }
 
         public void CreatePlayer(int level, string name)
@@ -179,8 +148,11 @@ namespace L40_databasePlayers
             Console.WriteLine("Игрок создан.");
         }
 
-        public void BanPlayer(int id)
+        public void BanPlayer()
         {
+            Console.Write("Введите id игрока: ");
+            int id = GetNumber();
+
             if (TryGetPlayer(id, out Player player))
             {
                 if (player.IsBaned)
@@ -195,8 +167,11 @@ namespace L40_databasePlayers
             }
         }
 
-        public void UnbanPlayer(int id)
+        public void UnbanPlayer()
         {
+            Console.Write("Введите id игрока: ");
+            int id = GetNumber();
+
             if (TryGetPlayer(id, out Player player))
             {
                 if (player.IsBaned)
@@ -229,6 +204,22 @@ namespace L40_databasePlayers
             player = null;
             Console.WriteLine("Не найдено игрока с таким id.");
             return false;
+        }
+
+        private int GetNumber()
+        {
+            int number = 0;
+            bool isNotCorrect = true;
+
+            while (isNotCorrect)
+            {
+                if (int.TryParse(Console.ReadLine(), out number))
+                    isNotCorrect = false;
+                else
+                    Erorr.Show();
+            }
+
+            return number;
         }
     }
 }
